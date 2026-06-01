@@ -1,0 +1,6 @@
+{
+  "name": "Rakshika",
+  "description": "An offline-first, high-security women safety portal boasting Virtual Safety Walk, Stealth Evidence Recorder, One-Touch Incident Reports, and Gemini AI safe pathways.",
+  "requestFramePermissions": ["camera", "microphone", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

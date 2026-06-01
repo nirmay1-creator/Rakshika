@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,500&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", "Space Grotesk", sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer utilities {
+  .alarm-blink {
+    animation: alarmGlow 1s infinite alternate;
+  }
+}
+
+/* Accessibility Font Scale Adjustments */
+.font-scale-large {
+  font-size: 1.15rem !important;
+}
+.font-scale-large h1,
+.font-scale-large .text-lg,
+.font-scale-large .text-xl,
+.font-scale-large .text-2xl,
+.font-scale-large .text-3xl {
+  font-size: 1.35em !important;
+}
+.font-scale-large h2 {
+  font-size: 1.45em !important;
+}
+.font-scale-large p,
+.font-scale-large span,
+.font-scale-large button,
+.font-scale-large input,
+.font-scale-large select,
+.font-scale-large label,
+.font-scale-large a {
+  font-size: 1.18em !important;
+}
+
+.font-scale-xl {
+  font-size: 1.3rem !important;
+}
+.font-scale-xl h1,
+.font-scale-xl .text-lg,
+.font-scale-xl .text-xl,
+.font-scale-xl .text-2xl,
+.font-scale-xl .text-3xl {
+  font-size: 1.55em !important;
+}
+.font-scale-xl h2 {
+  font-size: 1.7em !important;
+}
+.font-scale-xl p,
+.font-scale-xl span,
+.font-scale-xl button,
+.font-scale-xl input,
+.font-scale-xl select,
+.font-scale-xl label,
+.font-scale-xl a {
+  font-size: 1.32em !important;
+  line-height: 1.7 !important;
+}
+
+/* High Contrast Adjustments */
+.high-contrast-light-theme {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+.high-contrast-light-theme button {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #000000 !important;
+}
+.high-contrast-light-theme input, 
+.high-contrast-light-theme select {
+  border: 2px solid #000000 !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.high-contrast-dark-theme {
+  --background-fallback: #0a0408;
+  background: #000000 !important;
+  color: #ffff00 !important;
+}
+.high-contrast-dark-theme h1,
+.high-contrast-dark-theme h2,
+.high-contrast-dark-theme h3,
+.high-contrast-dark-theme h4,
+.high-contrast-dark-theme p,
+.high-contrast-dark-theme span,
+.high-contrast-dark-theme label,
+.high-contrast-dark-theme strong,
+.high-contrast-dark-theme italic {
+  color: #ffff00 !important;
+}
+.high-contrast-dark-theme .bg-white,
+.high-contrast-dark-theme .bg-slate-50,
+.high-contrast-dark-theme .bg-rose-50,
+.high-contrast-dark-theme .bg-rose-50\/20,
+.high-contrast-dark-theme .bg-[#fefcfd] {
+  background-color: #111111 !important;
+  border-color: #ffff00 !important;
+}
+.high-contrast-dark-theme button,
+.high-contrast-dark-theme .bg-[#291723],
+.high-contrast-dark-theme .bg-gradient-to-r,
+.high-contrast-dark-theme .bg-gradient-to-br {
+  background-image: none !important;
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 3px solid #ffff00 !important;
+}
+.high-contrast-dark-theme input,
+.high-contrast-dark-theme select,
+.high-contrast-dark-theme textarea {
+  background-color: #222222 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+.high-contrast-dark-theme .border-rose-100 {
+  border-color: #ffff00 !important;
+}
+
+@keyframes alarmGlow {
+  0% {
+    background-color: #b91c1c; /* red-700 */
+    box-shadow: 0 0 10px rgba(185, 28, 28, 0.5);
+  }
+  100% {
+    background-color: #dc2626; /* red-600 */
+    box-shadow: 0 0 25px rgba(220, 38, 38, 0.82);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "entities": {
+    "SosSettings": {
+      "title": "SOS Emergency Settings",
+      "description": "User's secure SOS configuration, including encrypted numbers, contact names, and custom trigger phrases.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID"
+        },
+        "policeNumber": {
+          "type": "string",
+          "description": "Encrypted primary emergency service number (Police)"
+        },
+        "contactName": {
+          "type": "string",
+          "description": "Encrypted relative's name"
+        },
+        "contactPhone": {
+          "type": "string",
+          "description": "Encrypted relative's phone number"
+        },
+        "voiceTrigger": {
+          "type": "string",
+          "description": "Custom spoken phrase to trigger hand-free SOS"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "policeNumber", "contactName", "contactPhone"]
+    },
+    "IncidentReport": {
+      "title": "Community Reported Incident",
+      "description": "Anonymized, encrypted hazard and incident report submitted by users to map dangerous zones.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["harassment", "unsafe_area", "low_lighting", "no_police", "other"]
+        },
+        "encryptedDetails": {
+          "type": "string",
+          "description": "Encrypted details of the incident for end-to-end privacy"
+        },
+        "cityName": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number"
+        },
+        "lng": {
+          "type": "number"
+        },
+        "upvotes": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "userId", "type", "encryptedDetails", "cityName", "lat", "lng", "createdAt"]
+    },
+    "LiveLocation": {
+      "title": "Live Tracking Coordinates",
+      "description": "Encrypted current GPS coordinates shared temporarily for live guardian tracking.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "encryptedCoords": {
+          "type": "string",
+          "description": "Encrypted coordinate payload (latitude & longitude)"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "userName", "encryptedCoords", "isActive", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}/settings/sos": {
+      "schema": "SosSettings",
+      "description": "Path to retrieve the single active SOS configuration for a specific user ID."
+    },
+    "incidents/{incidentId}": {
+      "schema": "IncidentReport",
+      "description": "Collection of all hazard and incident reports visible on the map."
+    },
+    "live_locations/{userId}": {
+      "schema": "LiveLocation",
+      "description": "Active real-time tracking points queried by verified guardians."
+    }
+  }
+}

@@ -1,0 +1,123 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- REUSABLE SECURITY PRIMITIVES AND HELPERS ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- COLLECTION RULES MATCHES ---
+
+    // 1. SOS Settings Map: User owned configuration
+    match /users/{userId}/settings/sos {
+      allow read: if isOwner(userId);
+      
+      allow create: if isOwner(userId) 
+        && isValidSosSettings(incoming())
+        && incoming().userId == userId;
+        
+      allow update: if isOwner(userId) 
+        && isValidSosSettings(incoming())
+        && incoming().userId == userId
+        && incoming().userId == existing().userId; // Immutable Owner
+
+      allow delete: if isOwner(userId);
+    }
+
+    function isValidSosSettings(data) {
+      return data.keys().hasAll(['userId', 'policeNumber', 'contactName', 'contactPhone', 'voiceTrigger', 'updatedAt'])
+        && data.keys().size() == 6
+        && data.userId is string
+        && data.policeNumber is string && data.policeNumber.size() <= 128
+        && data.contactName is string && data.contactName.size() <= 128
+        && data.contactPhone is string && data.contactPhone.size() <= 128
+        && data.voiceTrigger is string && data.voiceTrigger.size() <= 128;
+    }
+
+    // 2. Incident Reports: Unsafe spot coordinates & descriptions contributed by community
+    match /incidents/{incidentId} {
+      // Public reading allowed for authenticated users so they see hotspots on safe-routing map
+      allow read: if isSignedIn();
+      
+      allow create: if isSignedIn()
+        && isValidId(incidentId)
+        && isValidIncident(incoming())
+        && incoming().userId == request.auth.uid;
+
+      allow update: if isSignedIn()
+        && isValidIncident(incoming())
+        && incoming().userId == existing().userId // Owner verification
+        && (
+          // Action 1: Add upvote
+          (incoming().diff(existing()).affectedKeys().hasOnly(['upvotes']))
+          // Action 2: Change reports
+          || (incoming().diff(existing()).affectedKeys().hasOnly(['type', 'encryptedDetails']))
+        );
+
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+
+    function isValidIncident(data) {
+      return data.keys().hasAll(['id', 'userId', 'type', 'encryptedDetails', 'cityName', 'lat', 'lng', 'upvotes', 'createdAt'])
+        && data.keys().size() == 9
+        && data.id is string
+        && data.userId is string
+        && data.type is string && data.type in ['harassment', 'unsafe_area', 'low_lighting', 'no_police', 'other']
+        && data.encryptedDetails is string && data.encryptedDetails.size() <= 5000
+        && data.cityName is string && data.cityName.size() <= 128
+        && data.lat is number
+        && data.lng is number
+        && data.upvotes is int;
+    }
+
+    // 3. Live Guardian Tracking Coordinates
+    match /live_locations/{userId} {
+      // Allowed to read if signed in (e.g., matching a family member or dynamic tracker link)
+      allow read: if isSignedIn();
+      
+      allow create: if isOwner(userId)
+        && isValidLiveLocation(incoming())
+        && incoming().userId == userId;
+
+      allow update: if isOwner(userId)
+        && isValidLiveLocation(incoming())
+        && incoming().userId == userId
+        && incoming().userId == existing().userId
+        && incoming().userName == existing().userName;
+
+      allow delete: if isOwner(userId);
+    }
+
+    function isValidLiveLocation(data) {
+      return data.keys().hasAll(['userId', 'userName', 'encryptedCoords', 'isActive', 'updatedAt'])
+        && data.keys().size() == 5
+        && data.userId is string
+        && data.userName is string && data.userName.size() <= 128
+        && data.encryptedCoords is string && data.encryptedCoords.size() <= 1024
+        && data.isActive is bool;
+    }
+  }
+}
